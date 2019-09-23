@@ -9,68 +9,72 @@ module Ordu
 
   def self.included(mod)
     mod.send(:extend, DSL)
+    mod.send(:extend, Runner)
   end
 
-  def self.new
-    Ordu::Base.new
-  end
-
-  # The base class of an Ordu. You can extend this, or you can include the
-  # module.
-  class Base
-    extend Forwardable
-
-    def initialize
-      @parser = OptionParser.new
-    end
-
-    def name(*args)
-      return @parser.set_program_name(*args) if args.empty?
-
-      @parser.program_name
-    end
-
-    def version(*args)
-      puts "Setting version: #{args}"
-    end
-
-    def option(*args)
-      @parser.on(*args)
-    end
-
-    def parse!(*argv, into: nil)
-      @parser.parse!(*argv, into: into)
-      @action.call
-    end
-
-    def action(*methods, &block)
-      if methods.empty? && !block_given?
-        raise 'Invalid action (needs methods, symbols, or a block)'
-      end
-
-      @action = block
-      methods.each do |m|
-      end
+  # Methods to run an Ordu program
+  module Runner
+    def start!(args = ARGV)
+      option_parser.order!(args)
+      puts 'Starting!'
     end
   end
 
   # The DSL of Ordu
   module DSL
-    extend Forwardable
-    delegate %i[
-      name
-      version
-      parse!
-      parser
-      option
-      options
-      command
-      commands
-      action
-    ] => :ordu
+    def desc(desc = nil)
+      return @desc if desc.nil?
 
-    def ordu
-      @ordu ||= Ordu.new
+      @desc = desc
+    end
+
+    def name(name = nil)
+      return @name if name.nil?
+
+      @name = name
+    end
+
+    def version(version = nil)
+      return @version if version.nil?
+
+      @version = version
+    end
+
+    def help(help = nil)
+      return @help if help.nil?
+
+      @help = help
+    end
+
+    def opt(*args)
+      option_parser.on(*args)
+    end
+
+    def option_parser
+      @option_parser ||= OptionParser.new
+    end
+
+    def arg(name, type: String, required: false)
+      args << [name, type, required]
+    end
+
+    def args
+      @args ||= []
+    end
+
+    def before(&block)
+      @before ||= []
+      @before << block
+    end
+
+    def after(&block)
+      @after ||= []
+      @after << block
+    end
+
+    def action(&block)
+      @actions ||= []
+      @actions << block
     end
   end
 end
