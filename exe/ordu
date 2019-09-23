@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'ordu'
+
+Module.new do
+  include Ordu
+
+  name    'ordu'
+  version Ordu::VERSION
+
+  option('-n', '--dry-run', 'just print what would be output')
+
+  action do
+    require 'pry'
+    binding.pry
+  end
+end.parse!(ARGV)
