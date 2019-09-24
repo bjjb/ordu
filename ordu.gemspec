@@ -10,11 +10,11 @@ Gem::Specification.new do |spec|
   spec.authors       = ['JJ Buckley']
   spec.email         = ['jj@bjjb.org']
 
-  spec.summary       = 'A Ruby/Cloudflare CLI/API-client'
+  spec.summary       = 'A command-line library'
   spec.description   = <<-DESC
-  A Ruby API library for managing your cloudflare domains and settings. Comes
-  with a simple command-line tool. Also includes a little server and app,
-  providing a slighly RESTier API and a simplified CloudFlare UI.
+  A Ruby library for for building command-line programs. Based on the builtin
+  OptionParser. Includes a command-line program which builds stub command-line
+  programs.
   DESC
   spec.homepage      = 'http://bjjb.github.io/ordu'
   spec.license       = 'MIT'
@@ -26,8 +26,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_development_dependency 'bundler', '~> 2.0'
-  spec.add_development_dependency 'cucumber', '~> 3.1.2'
+  spec.add_development_dependency 'bundler', '~> 1.17'
   spec.add_development_dependency 'minitest', '~> 5.0'
   spec.add_development_dependency 'pry', '~> 0.12'
   spec.add_development_dependency 'rake', '~> 10.0'

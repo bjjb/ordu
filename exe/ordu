@@ -9,6 +9,8 @@ module Ordu
   # programs from the command-line. It also serves as a nice example of how to
   # write a program with ordu.
   module Generator
+    # This imbues the module with command-line definition magic, defining all
+    # of the methods that are called in the subsequent lines.
     include Ordu
 
     # The program_name
@@ -19,20 +21,21 @@ module Ordu
     version Ordu::VERSION
 
     # Printed at the top of usage (i.e., used in the banner)
-    desc 'Generate a new command-line application'
+    summary 'Generate a new command-line application'
 
-    # Printed when help is requested (with `help` or `-h, --help`).
-    help <<-DESC
+    # Printed when help is requested (with `help` or `-h, --help`), and in the
+    # manual.
+    desc <<-DESC
     Generates a new command-line application based on Ordu.
     DESC
 
     # Switches for the root command
-    opt '-n', '--dry-run', 'just print what would be output'
-    opt '-G', '--gemspec', 'create a gemspec'
-    opt '-B', '--bundler', 'create a Gemfile'
-    opt '-R', '--rakefile', 'create a Rakefile'
-    opt '-D', '--dockerfile', 'create a Dockerfile'
-    opt '-A', '--application', 'same as -BGSD' do
+    on '-n', '--dry-run', 'just print what would be output'
+    on '-G', '--gemspec', 'create a gemspec'
+    on '-B', '--bundler', 'create a Gemfile'
+    on '-R', '--rakefile', 'create a Rakefile'
+    on '-D', '--dockerfile', 'create a Dockerfile'
+    on '-A', '--application', 'same as -BGSD' do
       set(:G, true) unless get(:'no-gemspec')
       set(:B, true) unless get(:'no-gemfile')
       set(:R, true) unless get(:'no-rakefile')
@@ -41,31 +44,36 @@ module Ordu
 
     # The program accepts one argument - the name of the program to be
     # generated.
-    arg :name, type: String
+    arg 'NAME', String, 'the name of the program to be generated', :REQUIRED
 
     # This block is always executed _after_ switch parsing, _before_ any
     # actions.
     before do
-      return @write = ->(f) { puts 'Writing %<file>s'.format(f) } if get(:n)
-
-      @write = ->(f) { Pathname.new(f).write(template_for(f)) }
+      puts 'Starting...' if $VERBOSE
     end
 
     # This block is called if no sub-command is supplied. Here there's only
     # one action, but you can have several.
     action do |name = nil|
       name = guess_name if name.nil?
-      @write["#{name}.gemspec"] if get(:G)
-      @write['Gemfile'] if get(:B)
-      @write['Rakefile'] if get(:R)
-      @write['Dockerfile'] if get(:D)
+      @write["#{name}.gemspec"] if opt(:G)
+      @write['Gemfile'] if opt(:B)
+      @write['Rakefile'] if opt(:R)
+      @write['Dockerfile'] if opt(:D)
       @write[name]
     end
 
-    # This program doesn't have any sub-commands, but it would be easy to add
-    # some here.
+    # This block is always executed _after_ either appropriate sub-commands,
+    # or all _action_ blocks.
+    after do
+      puts 'Finishing up.'
+    end
+
+    # This program doesn't have any sub-commands.
 
     private
+
+    # Business logic follows:
 
     def template(name)
       case name
@@ -77,6 +85,7 @@ module Ordu
       end
     end
 
+    # Finally, we want to execute the module immediately if it's $0.
     $PROGRAM_NAME == __FILE__ && start!
   end
 end
