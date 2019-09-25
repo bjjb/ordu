@@ -3,14 +3,7 @@
 require 'optparse'
 
 # Ordu is a library to help you build command-line programs.
-module Ordu
+class Ordu < OptionParser
   autoload :DSL, 'ordu/dsl'
-  autoload :Execution, 'ordu/execution'
-  autoload :Executor, 'ordu/executor'
-  autoload :VERSION, 'ordu/version'
-
-  def self.included(mod)
-    mod.send(:extend, DSL)
-    mod.send(:extend, Execution)
-  end
+  extend DSL
 end
