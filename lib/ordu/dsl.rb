@@ -79,18 +79,5 @@ class Ordu
     def actions
       @actions ||= []
     end
-
-    def parse!(argv = ARGV)
-      puts <<-DESC
-        Parsing (#{argv})!
-        name = #{name}
-        version = #{version}
-        summary = #{summary}
-        description = #{description}
-        options = #{options}
-        arguments = #{arguments}
-        actions = #{actions}
-      DESC
-    end
   end
 end

@@ -7,7 +7,7 @@ require 'ordu/version'
 # An ordu program which can be used to create ordu programs from the
 # command-line. It also serves as a nice example of how to write a program
 # with ordu.
-Class.new(Ordu) do
+Ordu.new do
   name 'ordu'
 
   version Ordu::VERSION
