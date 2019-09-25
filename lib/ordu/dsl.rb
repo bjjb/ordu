@@ -4,7 +4,7 @@ class Ordu
   # The DSL of Ordu.
   module DSL
     def name(*args)
-      return name(yield) if args.empty? && block_given?
+      return (name = yield) if args.empty? && block_given?
 
       return name || super if args.empty?
 
@@ -16,7 +16,7 @@ class Ordu
     end
 
     def version(*args)
-      return version(yield) if args.empty? && block_given?
+      return (version = yield) if args.empty? && block_given?
 
       return version if args.empty?
 
@@ -28,7 +28,7 @@ class Ordu
     end
 
     def summary(*args)
-      return summary(yield) if args.empty? && block_given?
+      return (summary = yield) if args.empty? && block_given?
 
       return summary if args.empty?
 
@@ -37,6 +37,60 @@ class Ordu
 
     def summary=(summary)
       @summary = summary
+    end
+    alias short summary
+
+    def description(*args)
+      return (description = yield) if args.empty? && block_given?
+
+      return description if args.empty?
+
+      self.description = args.join("\n")
+    end
+    alias desc description
+    alias long description
+
+    def description=(description)
+      @description = description
+    end
+
+    def option(*args)
+      options.push(args)
+    end
+    alias on option
+
+    def options
+      @options ||= []
+    end
+
+    def argument(*args)
+      arguments.push(args)
+    end
+    alias arg argument
+
+    def arguments
+      @arguments ||= []
+    end
+
+    def action(*args)
+      actions.push(args)
+    end
+
+    def actions
+      @actions ||= []
+    end
+
+    def parse!(argv = ARGV)
+      puts <<-DESC
+        Parsing (#{argv})!
+        name = #{name}
+        version = #{version}
+        summary = #{summary}
+        description = #{description}
+        options = #{options}
+        arguments = #{arguments}
+        actions = #{actions}
+      DESC
     end
   end
 end

@@ -8,23 +8,16 @@ require 'ordu/version'
 # command-line. It also serves as a nice example of how to write a program
 # with ordu.
 Class.new(Ordu) do
-  # The program_name
   name 'ordu'
 
-  # The program version - by adding this, the `version` command and the
-  # `-V, --version` switches are added automatically.
   version Ordu::VERSION
 
-  # Printed at the top of usage (i.e., used in the banner)
   summary 'Generate a new command-line application'
 
-  # Printed when help is requested (with `help` or `-h, --help`), and in the
-  # manual.
   desc <<-DESC
   Generates a new command-line application based on Ordu.
   DESC
 
-  # Switches for the root command
   on '-n', '--dry-run', 'just print what would be output'
   on '-G', '--gemspec', 'create a gemspec'
   on '-B', '--bundler', 'create a Gemfile'
@@ -37,49 +30,11 @@ Class.new(Ordu) do
     set(:D, true) unless get(:'no-dockerfile')
   end
 
-  # The program accepts one argument - the name of the program to be
-  # generated.
   arg 'NAME', String, 'the name of the program to be generated', :REQUIRED
 
-  # This block is always executed _after_ switch parsing, _before_ any
-  # actions.
-  before do
-    puts 'Starting...' if $VERBOSE
-  end
-
-  # This block is called if no sub-command is supplied. Here there's only
-  # one action, but you can have several.
-  action do |name = nil|
-    name = guess_name if name.nil?
-    @write["#{name}.gemspec"] if opt(:G)
-    @write['Gemfile'] if opt(:B)
-    @write['Rakefile'] if opt(:R)
-    @write['Dockerfile'] if opt(:D)
-    @write[name]
-  end
-
-  # This block is always executed _after_ either appropriate sub-commands,
-  # or all _action_ blocks.
-  after do
-    puts 'Finishing up.'
-  end
-
-  # This program doesn't have any sub-commands.
-
-  private
+  action :run
 
   # Business logic follows:
 
-  def template(name)
-    case name
-    when /(Gemfile|Rakefile|Dockerfile)/ then name
-    when /(.+).gemspec/ then 'gemspec'
-    when get(:name) then 'program'
-    else
-      raise ArgumentError('invalid template %<name>'.format(name))
-    end
-  end
-
-  # Finally, we want to execute the module immediately if it's $0.
   $PROGRAM_NAME == __FILE__ && parse!(ARGV)
 end
